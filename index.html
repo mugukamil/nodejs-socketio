@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h1></h1>
+
+    <form action="">
+        <input type="text">
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Who in chatroom</h2>
+    <ul>
+        
+    </ul>
+
+    <hr />
+
+    <div>
+        
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io.connect('http://localhost:3002')
+        const form = document.querySelector('form')
+        const div = document.querySelector('div')
+        const status = document.querySelector('h1')
+        const ul = document.querySelector('ul')
+
+        socket.on('connect', (data) => {
+            nickname = prompt('what is your name?')
+            status.textContent = `welcome to chat ${nickname}`
+
+            socket.emit('join', nickname)
+        })
+
+        socket.on('add chatter', (data) => {
+            let chatter = document.createElement('li')
+            chatter.dataset.name = data.name
+            chatter.textContent = data.name
+
+            ul.appendChild(chatter)
+        })
+
+        socket.on('remove chatter', (data) => {
+            let rmChatter = document.querySelector(`[data-name="${data.name}"]`)
+            console.log('chatter', data.name);
+
+            ul.removeChild(rmChatter)
+        })
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+            const input = document.querySelector('input')
+
+            let message = input.value
+            input.value = ''
+
+            socket.emit('messages', message)
+        })
+
+        function insertMessage(text) {
+            let p = document.createElement('p')
+            p.textContent = text
+
+            div.appendChild(p)
+        }
+
+        socket.on('messages', (data) => { insertMessage(data) })
+
+    </script>
+</body>
+</html>
